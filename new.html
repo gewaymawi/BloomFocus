@@ -180,6 +180,58 @@
   /* Toast */
   .toast{position:fixed;bottom:24px;right:24px;background:#2d2d2d;color:white;padding:12px 20px;border-radius:14px;font-size:13px;z-index:999;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none}
   .toast.show{opacity:1;transform:translateY(0)}
+
+  /* === MODAL OVERLAY === */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s}
+  .modal-overlay.open{opacity:1;pointer-events:all}
+  .modal{background:white;border-radius:24px;padding:32px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.15);transform:translateY(20px);transition:transform 0.25s}
+  .modal-overlay.open .modal{transform:translateY(0)}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+  .modal-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--text)}
+  .modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--warm);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:background 0.2s}
+  .modal-close:hover{background:#ede8de}
+
+  /* Profile modal */
+  .avatar-row{display:flex;align-items:center;gap:20px;margin-bottom:24px}
+  .avatar-circle{width:72px;height:72px;border-radius:50%;background:var(--sage-light);display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;border:3px solid var(--sage);transition:transform 0.15s;position:relative;overflow:hidden}
+  .avatar-circle:hover{transform:scale(1.05)}
+  .avatar-emoji-picker{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;background:var(--warm);border-radius:14px;padding:12px}
+  .avatar-opt{font-size:22px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background 0.15s}
+  .avatar-opt:hover,.avatar-opt.selected{background:white}
+  .field-group{margin-bottom:16px}
+  .field-label{font-size:12px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+  .field-input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid #e0d8cc;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:white;outline:none;transition:border 0.2s}
+  .field-input:focus{border-color:var(--sage)}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .profile-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+  .profile-stat{background:var(--warm);border-radius:14px;padding:14px;text-align:center}
+  .profile-stat-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--sage-dark)}
+  .profile-stat-label{font-size:11px;color:var(--muted);margin-top:2px}
+  .modal-save-btn{width:100%;padding:13px;background:var(--sage);color:white;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;margin-top:8px;transition:background 0.2s}
+  .modal-save-btn:hover{background:var(--sage-dark)}
+
+  /* Garden Settings modal */
+  .settings-section{margin-bottom:20px}
+  .settings-section-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0ebe2}
+  .toggle-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+  .toggle-label{font-size:14px;color:var(--text)}
+  .toggle-sub{font-size:12px;color:var(--muted)}
+  .toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
+  .toggle-switch input{opacity:0;width:0;height:0}
+  .toggle-slider{position:absolute;inset:0;background:#ddd;border-radius:24px;cursor:pointer;transition:background 0.2s}
+  .toggle-slider:before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:white;top:3px;left:3px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+  .toggle-switch input:checked+.toggle-slider{background:var(--sage)}
+  .toggle-switch input:checked+.toggle-slider:before{transform:translateX(20px)}
+  .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+  .theme-opt{border-radius:12px;padding:10px 8px;cursor:pointer;border:2px solid transparent;text-align:center;font-size:12px;transition:all 0.2s}
+  .theme-opt:hover{border-color:#ddd}
+  .theme-opt.selected{border-color:var(--sage)}
+  .theme-swatch{height:28px;border-radius:8px;margin-bottom:6px}
+  .goal-selector{display:flex;align-items:center;gap:10px;margin-top:6px}
+  .goal-selector input[type=range]{flex:1;accent-color:var(--sage)}
+  .goal-val{min-width:40px;text-align:center;font-weight:600;color:var(--sage-dark);font-size:15px}
+  .danger-btn{width:100%;padding:11px;background:white;color:var(--accent);border:1px solid #f4c9c0;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;transition:all 0.2s;margin-top:6px}
+  .danger-btn:hover{background:#fff0ee;border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -199,8 +251,8 @@
 </nav>
 
 <div class="logo-menu" id="logoMenu">
-  <div class="menu-item" onclick="showToast('Profile opening...')">👤 User Profile</div>
-  <div class="menu-item" onclick="showToast('Settings opening...')">⚙️ Garden Settings</div>
+  <div class="menu-item" onclick="openProfileModal()">👤 User Profile</div>
+  <div class="menu-item" onclick="openGardenSettingsModal()">⚙️ Garden Settings</div>
   <hr style="border: 0; border-top: 1px solid #eee; margin: 5px 0;">
   <div class="menu-item" onclick="window.location.href='bloomlogin.html'" style="color: var(--accent);">🚪 Log Out</div>
 </div>
@@ -285,7 +337,7 @@
   <div style="max-width:900px;margin:0 auto">
     <div class="garden-header">
       <div>
-        <div class="section-title">My Flower Garden</div>
+        <div class="section-title" id="gardenTitle">My Flower Garden</div>
         <div class="section-sub">Each flower represents a completed focus session</div>
       </div>
       <div class="garden-stats">
@@ -361,6 +413,199 @@
         <div id="upcomingList" style="display:flex;flex-direction:column;gap:8px"></div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- USER PROFILE MODAL -->
+<div class="modal-overlay" id="profileModal" onclick="closeModal('profileModal',event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">👤 User Profile</div>
+      <button class="modal-close" onclick="closeModal('profileModal')">×</button>
+    </div>
+
+    <div class="avatar-row">
+      <div class="avatar-circle" id="avatarDisplay" onclick="toggleAvatarPicker()">🌸</div>
+      <div>
+        <div style="font-size:15px;font-weight:500;color:var(--text)" id="profileDisplayName">Bloom User</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px">Click avatar to change</div>
+      </div>
+    </div>
+
+    <div class="avatar-emoji-picker" id="avatarPicker" style="display:none">
+      <span class="avatar-opt" onclick="setAvatar('🌸')">🌸</span>
+      <span class="avatar-opt" onclick="setAvatar('🌻')">🌻</span>
+      <span class="avatar-opt" onclick="setAvatar('🌺')">🌺</span>
+      <span class="avatar-opt" onclick="setAvatar('🌼')">🌼</span>
+      <span class="avatar-opt" onclick="setAvatar('🪷')">🪷</span>
+      <span class="avatar-opt" onclick="setAvatar('🌹')">🌹</span>
+      <span class="avatar-opt" onclick="setAvatar('🍀')">🍀</span>
+      <span class="avatar-opt" onclick="setAvatar('🦋')">🦋</span>
+      <span class="avatar-opt" onclick="setAvatar('🐝')">🐝</span>
+      <span class="avatar-opt" onclick="setAvatar('🌿')">🌿</span>
+      <span class="avatar-opt" onclick="setAvatar('🍃')">🍃</span>
+      <span class="avatar-opt" onclick="setAvatar('✨')">✨</span>
+    </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">First Name</div>
+        <input class="field-input" id="profileFirstName" placeholder="e.g. Sophie" maxlength="30"/>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Last Name</div>
+        <input class="field-input" id="profileLastName" placeholder="e.g. Garden" maxlength="30"/>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Display Name / Nickname</div>
+      <input class="field-input" id="profileNickname" placeholder="How should we call you?" maxlength="40"/>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Study Goal</div>
+      <input class="field-input" id="profileGoal" placeholder="e.g. Ace my finals 🎓" maxlength="80"/>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Bio / Motto</div>
+      <textarea class="field-input" id="profileBio" placeholder="A little about yourself..." rows="2" maxlength="150" style="resize:none"></textarea>
+    </div>
+
+    <div class="profile-stats-grid">
+      <div class="profile-stat">
+        <div class="profile-stat-num" id="pstat-flowers">0</div>
+        <div class="profile-stat-label">Flowers</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-num" id="pstat-hours">0h</div>
+        <div class="profile-stat-label">Hours Studied</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-num" id="pstat-streak">0</div>
+        <div class="profile-stat-label">Day Streak</div>
+      </div>
+    </div>
+
+    <button class="modal-save-btn" onclick="saveProfile()">Save Profile</button>
+  </div>
+</div>
+
+<!-- GARDEN SETTINGS MODAL -->
+<div class="modal-overlay" id="gardenSettingsModal" onclick="closeModal('gardenSettingsModal',event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ Garden Settings</div>
+      <button class="modal-close" onclick="closeModal('gardenSettingsModal')">×</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">🌸 Garden Theme</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Choose your garden's color palette</div>
+      <div class="theme-grid" id="themeGrid">
+        <div class="theme-opt selected" data-theme="bloom" onclick="selectTheme(this)">
+          <div class="theme-swatch" style="background:linear-gradient(135deg,#c8ddc9,#f4a5b0)"></div>
+          Bloom
+        </div>
+        <div class="theme-opt" data-theme="sunset" onclick="selectTheme(this)">
+          <div class="theme-swatch" style="background:linear-gradient(135deg,#f9c8a6,#f4a5b0)"></div>
+          Sunset
+        </div>
+        <div class="theme-opt" data-theme="ocean" onclick="selectTheme(this)">
+          <div class="theme-swatch" style="background:linear-gradient(135deg,#b3cde8,#a8d8b0)"></div>
+          Ocean
+        </div>
+        <div class="theme-opt" data-theme="lavender" onclick="selectTheme(this)">
+          <div class="theme-swatch" style="background:linear-gradient(135deg,#d4b8e0,#f4a5b0)"></div>
+          Lavender
+        </div>
+        <div class="theme-opt" data-theme="forest" onclick="selectTheme(this)">
+          <div class="theme-swatch" style="background:linear-gradient(135deg,#4a6e4e,#a8d8b0)"></div>
+          Forest
+        </div>
+        <div class="theme-opt" data-theme="rose" onclick="selectTheme(this)">
+          <div class="theme-swatch" style="background:linear-gradient(135deg,#f4a5b0,#d4b8e0)"></div>
+          Rose
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">🎯 Daily Goal</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Sessions to complete each day</div>
+      <div class="goal-selector">
+        <span>1</span>
+        <input type="range" id="dailyGoalSlider" min="1" max="12" value="4" oninput="updateGoalLabel(this.value)"/>
+        <span>12</span>
+        <div class="goal-val" id="goalValDisplay">4</div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">🔔 Notifications & Sound</div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Sound alerts</div>
+          <div class="toggle-sub">Play a chime when session ends</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="settingSoundAlert" checked/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Auto-start breaks</div>
+          <div class="toggle-sub">Automatically begin break timer</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="settingAutoBreak"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Show motivational quotes</div>
+          <div class="toggle-sub">Display a quote after each session</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="settingQuotes" checked/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">🌱 Garden Display</div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Show dates on flowers</div>
+          <div class="toggle-sub">Display the date each flower was grown</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="settingShowDates" checked/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Animate flowers</div>
+          <div class="toggle-sub">Gentle sway animation in the garden</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="settingAnimateFlowers" checked/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">⚠️ Data</div>
+      <button class="danger-btn" onclick="confirmClearGarden()">🗑 Clear Garden &amp; Reset Progress</button>
+    </div>
+
+    <button class="modal-save-btn" onclick="saveGardenSettings()">Save Settings</button>
   </div>
 </div>
 
@@ -776,7 +1021,178 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// ---- INIT ----
+// ---- PROFILE ----
+let profileData = JSON.parse(localStorage.getItem('bloom_profile') || '{}');
+
+function openProfileModal() {
+  document.getElementById('logoMenu').classList.remove('show');
+  // Populate fields
+  const p = profileData;
+  document.getElementById('avatarDisplay').textContent = p.avatar || '🌸';
+  document.getElementById('profileFirstName').value = p.firstName || '';
+  document.getElementById('profileLastName').value = p.lastName || '';
+  document.getElementById('profileNickname').value = p.nickname || '';
+  document.getElementById('profileGoal').value = p.goal || '';
+  document.getElementById('profileBio').value = p.bio || '';
+  document.getElementById('profileDisplayName').textContent = p.nickname || p.firstName || 'Bloom User';
+  // Stats
+  document.getElementById('pstat-flowers').textContent = flowers.length;
+  const hrs = Math.round(flowers.length * focusMins / 60 * 10) / 10;
+  document.getElementById('pstat-hours').textContent = hrs + 'h';
+  document.getElementById('pstat-streak').textContent = Math.ceil(flowers.length / 4) || 0;
+  // Mark selected avatar
+  document.querySelectorAll('.avatar-opt').forEach(o => {
+    o.classList.toggle('selected', o.textContent.trim() === (p.avatar || '🌸'));
+  });
+  document.getElementById('avatarPicker').style.display = 'none';
+  document.getElementById('profileModal').classList.add('open');
+}
+
+function toggleAvatarPicker() {
+  const picker = document.getElementById('avatarPicker');
+  picker.style.display = picker.style.display === 'none' ? 'flex' : 'none';
+}
+
+function setAvatar(emoji) {
+  document.getElementById('avatarDisplay').textContent = emoji;
+  document.querySelectorAll('.avatar-opt').forEach(o => {
+    o.classList.toggle('selected', o.textContent.trim() === emoji);
+  });
+  document.getElementById('avatarPicker').style.display = 'none';
+}
+
+function saveProfile() {
+  profileData = {
+    avatar: document.getElementById('avatarDisplay').textContent,
+    firstName: document.getElementById('profileFirstName').value.trim(),
+    lastName: document.getElementById('profileLastName').value.trim(),
+    nickname: document.getElementById('profileNickname').value.trim(),
+    goal: document.getElementById('profileGoal').value.trim(),
+    bio: document.getElementById('profileBio').value.trim(),
+  };
+  localStorage.setItem('bloom_profile', JSON.stringify(profileData));
+  // Update nav logo area if nickname set
+  const name = profileData.nickname || profileData.firstName;
+  document.getElementById('profileDisplayName').textContent = name || 'Bloom User';
+  updateGardenTitle();
+  closeModal('profileModal');
+  showToast('✅ Profile saved!');
+}
+
+function updateGardenTitle() {
+  const p = profileData;
+  const name = p.nickname || p.firstName;
+  document.getElementById('gardenTitle').textContent = name ? `${name}'s Flower Garden` : 'My Flower Garden';
+}
+
+// ---- GARDEN SETTINGS ----
+let gardenSettings = JSON.parse(localStorage.getItem('bloom_garden_settings') || '{}');
+
+const THEMES = {
+  bloom:    { sage: '#7a9e7e', sageLight: '#c8ddc9', sageDark: '#4a6e4e', petal1: '#f4a5b0' },
+  sunset:   { sage: '#c5785f', sageLight: '#f9c8a6', sageDark: '#8B4513', petal1: '#f4a5b0' },
+  ocean:    { sage: '#4a8fa8', sageLight: '#b3cde8', sageDark: '#1e5f74', petal1: '#a8d8b0' },
+  lavender: { sage: '#9b7bb8', sageLight: '#d4b8e0', sageDark: '#6a4c93', petal1: '#f4a5b0' },
+  forest:   { sage: '#4a6e4e', sageLight: '#a8d8b0', sageDark: '#2d4a2f', petal1: '#f9c8a6' },
+  rose:     { sage: '#c9748a', sageLight: '#f4c4cf', sageDark: '#8b3a52', petal1: '#d4b8e0' },
+};
+
+function openGardenSettingsModal() {
+  document.getElementById('logoMenu').classList.remove('show');
+  const s = gardenSettings;
+  // Restore toggles
+  document.getElementById('settingSoundAlert').checked = s.soundAlert !== false;
+  document.getElementById('settingAutoBreak').checked = !!s.autoBreak;
+  document.getElementById('settingQuotes').checked = s.quotes !== false;
+  document.getElementById('settingShowDates').checked = s.showDates !== false;
+  document.getElementById('settingAnimateFlowers').checked = s.animateFlowers !== false;
+  // Daily goal
+  const goal = s.dailyGoal || 4;
+  document.getElementById('dailyGoalSlider').value = goal;
+  document.getElementById('goalValDisplay').textContent = goal;
+  // Theme
+  const theme = s.theme || 'bloom';
+  document.querySelectorAll('.theme-opt').forEach(o => {
+    o.classList.toggle('selected', o.dataset.theme === theme);
+  });
+  document.getElementById('gardenSettingsModal').classList.add('open');
+}
+
+function updateGoalLabel(val) {
+  document.getElementById('goalValDisplay').textContent = val;
+}
+
+function selectTheme(el) {
+  document.querySelectorAll('.theme-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function applyTheme(themeName) {
+  const t = THEMES[themeName] || THEMES.bloom;
+  const root = document.documentElement;
+  root.style.setProperty('--sage', t.sage);
+  root.style.setProperty('--sage-light', t.sageLight);
+  root.style.setProperty('--sage-dark', t.sageDark);
+  root.style.setProperty('--petal1', t.petal1);
+}
+
+function saveGardenSettings() {
+  const selectedThemeEl = document.querySelector('.theme-opt.selected');
+  const theme = selectedThemeEl ? selectedThemeEl.dataset.theme : 'bloom';
+  gardenSettings = {
+    soundAlert: document.getElementById('settingSoundAlert').checked,
+    autoBreak: document.getElementById('settingAutoBreak').checked,
+    quotes: document.getElementById('settingQuotes').checked,
+    showDates: document.getElementById('settingShowDates').checked,
+    animateFlowers: document.getElementById('settingAnimateFlowers').checked,
+    dailyGoal: parseInt(document.getElementById('dailyGoalSlider').value),
+    theme,
+  };
+  localStorage.setItem('bloom_garden_settings', JSON.stringify(gardenSettings));
+  applyTheme(theme);
+  // Apply show-dates setting to garden
+  renderGarden();
+  closeModal('gardenSettingsModal');
+  showToast('🌱 Garden settings saved!');
+}
+
+function confirmClearGarden() {
+  if (confirm('This will permanently delete all your flowers and reset your progress. Are you sure?')) {
+    flowers = [];
+    sessions = 0;
+    localStorage.removeItem('bloom_flowers');
+    updateSessionCount();
+    renderGarden();
+    closeModal('gardenSettingsModal');
+    showToast('🌱 Garden cleared. Start fresh!');
+  }
+}
+
+// ---- MODAL HELPERS ----
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id, event) {
+  if (event && event.target !== document.getElementById(id)) return;
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close modals on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  }
+});
+
+// Apply saved theme on load
+(function initSettings() {
+  const s = JSON.parse(localStorage.getItem('bloom_garden_settings') || '{}');
+  if (s.theme) applyTheme(s.theme);
+  gardenSettings = s;
+  updateGardenTitle();
+})();
+
+
 updateDisplay();
 updateSessionCount();
 renderGarden();
