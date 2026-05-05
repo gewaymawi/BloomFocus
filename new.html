@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bloom Study Garden</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --sage:#7a9e7e;--sage-light:#c8ddc9;--sage-dark:#4a6e4e;
+    --cream:#faf7f2;--warm:#f5efe6;--petal1:#f4a5b0;--petal2:#f9c8a6;
+    --petal3:#a8d8b0;--petal4:#b3cde8;--petal5:#d4b8e0;
+    --soil:#8B6F47;--text:#2d2d2d;--muted:#7a7a7a;
+    --accent:#c5785f;--sky:#e8f4f8;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;overflow-x:hidden}
+  h1,h2,h3{font-family:'Playfair Display',serif}
+
+  /* Hide screen-reader-only elements visually */
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  
+  /* NAV */
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:white;border-bottom:1px solid #e8e2d8;position:sticky;top:0;z-index:100}
+  .nav-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--sage-dark);letter-spacing:-0.5px}
+  .nav-logo span{color:var(--petal1); font-size: 10px}
+  .nav-tabs{display:flex;gap:4px;background:var(--warm);border-radius:24px;padding:4px}
+  .tab-btn{padding:7px 18px;border:none;border-radius:20px;background:transparent;cursor:pointer;font: size 15px; font-family:'DM Sans',sans-serif;color:var(--muted);font-weight:400;transition:all 0.2s}
+  .tab-btn.active{background:white;color:var(--sage-dark);font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+
+  /* === LOGO MENU STYLES === */
+.logo-menu {
+  position: absolute;
+  top: 60px; 
+  left: 28px;
+  background: white;
+  border: 1px solid #ede8e0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  width: 180px;
+  display: none; /* Hidden by default */
+  flex-direction: column;
+  padding: 8px;
+  z-index: 1000;
+  animation: menuFade 0.2s ease;
+}
+
+.logo-menu.show {
+  display: flex;
+}
+
+@keyframes menuFade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.menu-item {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.menu-item:hover {
+  background: var(--warm);
+  color: var(--sage-dark);
+}
+  
+  /* PANELS */
+  .panel{display:none;padding:24px 28px;min-height:calc(100vh - 60px);animation:fadeIn 0.3s ease}
+  .panel.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  
+  /* === TIMER PANEL === */
+  .timer-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px;margin:0 auto}
+  .timer-card{background:white;border-radius:20px;padding:28px;border:1px solid #ede8e0}
+  .timer-display{text-align:center;padding:20px 0}
+  .timer-ring{position:relative;width:200px;height:200px;margin:0 auto 20px}
+  .timer-ring svg{transform:rotate(-90deg)}
+  .timer-circle-bg{fill:none;stroke:#f0ebe2;stroke-width:8}
+  .timer-circle{fill:none;stroke:var(--sage);stroke-width:8;stroke-linecap:round;stroke-dasharray:565;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke 0.5s}
+  .timer-time{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  .timer-time .time-big{font-family:'Playfair Display',serif;font-size:42px;font-weight:600;color:var(--text);line-height:1}
+  .timer-time .time-label{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+  .timer-mode{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+  .mode-btn{padding:6px 14px;border-radius:16px;border:1px solid #e0d8cc;background:transparent;cursor:pointer;font-size:12px;color:var(--muted);font-family:'DM Sans',sans-serif;transition:all 0.2s}
+  .mode-btn.active{background:var(--sage);color:white;border-color:var(--sage)}
+  .timer-controls{display:flex;gap:12px;justify-content:center}
+  .ctrl-btn{width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;font-size:18px;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+  .ctrl-btn.primary{background:var(--sage);color:white}
+  .ctrl-btn.primary:hover{background:var(--sage-dark)}
+  .ctrl-btn.secondary{background:var(--warm);color:var(--text)}
+  .ctrl-btn.secondary:hover{background:#ede8de}
+  
+  /* Session settings */
+  .settings-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0ebe2}
+  .settings-row:last-child{border-bottom:none}
+  .settings-label{font-size:13px;color:var(--muted)}
+  .settings-val{font-size:14px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px}
+  .num-btn{width:24px;height:24px;border-radius:50%;border:1px solid #ddd;background:white;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--sage-dark)}
+  .streak-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+  .streak-dot{width:28px;height:28px;border-radius:50%;background:var(--sage-light);display:flex;align-items:center;justify-content:center;font-size:11px}
+  .streak-dot.done{background:var(--sage);color:white}
+  
+  /* FLOWER SVG */
+  .growing-flower{display:flex;justify-content:center;align-items:flex-end;height:180px;margin:10px 0}
+  
+  /* === GARDEN PANEL === */
+  .garden-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+  .garden-stats{display:flex;gap:16px}
+  .stat-pill{background:white;border:1px solid #ede8e0;border-radius:20px;padding:6px 14px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .stat-pill strong{color:var(--text);font-weight:500}
+  .garden-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:16px;background:white;border-radius:20px;padding:24px;border:1px solid #ede8e0;min-height:220px}
+  .plot{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:default}
+  .plot-label{font-size:10px;color:var(--muted);text-align:center}
+  .empty-plot{width:50px;height:50px;border:2px dashed #ddd;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#ccc}
+  
+  /* === TODO PANEL === */
+  .todo-layout{max-width:680px;margin:0 auto}
+  .todo-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+  .add-todo-form{display:flex;gap:10px;margin-bottom:20px}
+  .add-todo-form input{flex:1;padding:12px 16px;border-radius:14px;border:1px solid #e0d8cc;font-family:'DM Sans',sans-serif;font-size:14px;background:white;outline:none;color:var(--text)}
+  .add-todo-form input:focus{border-color:var(--sage)}
+  .add-btn{padding:12px 20px;background:var(--sage);color:white;border:none;border-radius:14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;transition:background 0.2s}
+  .add-btn:hover{background:var(--sage-dark)}
+  .todo-filters{display:flex;gap:6px;margin-bottom:16px}
+  .filter-btn{padding:5px 12px;border-radius:12px;border:1px solid #e0d8cc;background:transparent;cursor:pointer;font-size:12px;color:var(--muted);font-family:'DM Sans',sans-serif;transition:all 0.2s}
+  .filter-btn.active{background:var(--sage);color:white;border-color:var(--sage)}
+  .todo-list{display:flex;flex-direction:column;gap:8px}
+  .todo-item{display:flex;align-items:center;gap:12px;background:white;border-radius:14px;padding:14px 16px;border:1px solid #ede8e0;transition:opacity 0.2s}
+  .todo-item.done{opacity:0.55}
+  .todo-check{width:20px;height:20px;border-radius:50%;border:2px solid #ccc;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
+  .todo-check.checked{background:var(--sage);border-color:var(--sage);color:white}
+  .todo-text{flex:1;font-size:14px}
+  .todo-text.done{text-decoration:line-through;color:var(--muted)}
+  .todo-tag{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:500}
+  .todo-del{background:none;border:none;cursor:pointer;color:#ccc;font-size:16px;padding:0 4px;transition:color 0.2s}
+  .todo-del:hover{color:var(--accent)}
+  .priority-sel{padding:4px 8px;border-radius:10px;border:1px solid #e0d8cc;font-size:12px;background:white;color:var(--muted);font-family:'DM Sans',sans-serif}
+  
+  /* === CALENDAR PANEL === */
+  .cal-layout{display:grid;grid-template-columns:1fr 300px;gap:24px;max-width:960px;margin:0 auto}
+  .cal-card{background:white;border-radius:20px;padding:24px;border:1px solid #ede8e0}
+  .cal-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+  .cal-nav-btn{background:var(--warm);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background 0.2s}
+  .cal-nav-btn:hover{background:#ede8de}
+  .cal-month{font-family:'Playfair Display',serif;font-size:20px;font-weight:600}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .cal-day-name{text-align:center;font-size:11px;color:var(--muted);padding:6px 0;font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+  .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:6px 4px;border-radius:10px;cursor:pointer;transition:background 0.15s;position:relative;min-height:44px}
+  .cal-day:hover{background:var(--warm)}
+  .cal-day.other-month .day-num{color:#ccc}
+  .cal-day.today .day-num{background:var(--sage);color:white;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+  .cal-day.selected{background:var(--sage-light)}
+  .day-num{font-size:13px;font-weight:500;color:var(--text);width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+  .day-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);margin-top:2px}
+  
+  /* Events sidebar */
+  .event-date-title{font-family:'Playfair Display',serif;font-size:17px;margin-bottom:14px}
+  .event-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+  .event-item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid #ede8e0;background:var(--warm)}
+  .event-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+  .event-title{font-size:13px;font-weight:500;color:var(--text)}
+  .event-time{font-size:11px;color:var(--muted)}
+  .event-del{background:none;border:none;cursor:pointer;color:#ccc;font-size:13px;margin-left:auto;padding:0}
+  .event-del:hover{color:var(--accent)}
+  .add-event-form{display:flex;flex-direction:column;gap:8px}
+  .add-event-form input,.add-event-form select{padding:10px 12px;border-radius:12px;border:1px solid #e0d8cc;font-family:'DM Sans',sans-serif;font-size:13px;background:white;color:var(--text);outline:none}
+  .add-event-form input:focus,.add-event-form select:focus{border-color:var(--sage)}
+  .event-colors{display:flex;gap:6px;align-items:center}
+  .color-dot-btn{width:20px;height:20px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s}
+  .color-dot-btn.selected{border-color:var(--text);transform:scale(1.15)}
+  
+  /* Section title */
+  .section-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--text)}
+  .section-sub{font-size:13px;color:var(--muted);margin-top:2px}
+  
+  /* Toast */
+  .toast{position:fixed;bottom:24px;right:24px;background:#2d2d2d;color:white;padding:12px 20px;border-radius:14px;font-size:13px;z-index:999;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+    
+
+<nav class="nav">
+  <div class="nav-logo" id="logoBtn" onclick="toggleMenu(event)" style="cursor: pointer;">
+    Bloom<span>🌸</span>
+  </div>
+  
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('timer',event)">🌸 Focus</button>
+    <button class="tab-btn" onclick="switchTab('garden',event)">🌻 Garden</button>
+    <button class="tab-btn" onclick="switchTab('todo',event)">✅ Tasks</button>
+    <button class="tab-btn" onclick="switchTab('calendar',event)">📅 Schedule</button>
+  </div>
+</nav>
+
+<div class="logo-menu" id="logoMenu">
+  <div class="menu-item" onclick="showToast('Profile opening...')">👤 User Profile</div>
+  <div class="menu-item" onclick="showToast('Settings opening...')">⚙️ Garden Settings</div>
+  <hr style="border: 0; border-top: 1px solid #eee; margin: 5px 0;">
+  <div class="menu-item" onclick="window.location.href='bloomlogin.html'" style="color: var(--accent);">🚪 Log Out</div>
+</div>
+
+<!-- TIMER -->
+<div id="panel-timer" class="panel active">
+  <div class="timer-layout">
+    <div class="timer-card">
+      <div style="text-align:center;margin-bottom:8px">
+        <div class="section-title">Focus Session</div>
+        <div class="section-sub">Grow a flower with every session</div>
+      </div>
+      <div class="timer-mode">
+        <button class="mode-btn active" onclick="setMode('focus',this)">Focus</button>
+        <button class="mode-btn" onclick="setMode('short',this)">Short Break</button>
+        <button class="mode-btn" onclick="setMode('long',this)">Long Break</button>
+      </div>
+      <div class="timer-display">
+        <div class="timer-ring">
+          <svg width="200" height="200" viewBox="0 0 200 200">
+            <circle class="timer-circle-bg" cx="100" cy="100" r="90"/>
+            <circle id="timerCircle" class="timer-circle" cx="100" cy="100" r="90"/>
+          </svg>
+          <div class="timer-time">
+            <div class="time-big" id="timerDisplay">25:00</div>
+            <div class="time-label" id="timerLabel">FOCUS TIME</div>
+          </div>
+        </div>
+        <div class="growing-flower">
+          <svg id="flowerSvg" width="120" height="160" viewBox="0 0 120 160"></svg>
+        </div>
+        <div class="timer-controls">
+          <button class="ctrl-btn secondary" onclick="resetTimer()">↺</button>
+          <button class="ctrl-btn primary" id="startBtn" onclick="toggleTimer()">▶</button>
+          <button class="ctrl-btn secondary" onclick="skipSession()">⇥</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="timer-card" style="margin-bottom:16px">
+        <div class="section-title" style="font-size:16px;margin-bottom:14px">Session Settings</div>
+        <div class="settings-row">
+          <span class="settings-label">Focus duration</span>
+          <span class="settings-val">
+            <button class="num-btn" onclick="adjustTime('focus',-5)">−</button>
+            <span id="focusMins">25</span> min
+            <button class="num-btn" onclick="adjustTime('focus',5)">+</button>
+          </span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">Short break</span>
+          <span class="settings-val">
+            <button class="num-btn" onclick="adjustTime('short',-1)">−</button>
+            <span id="shortMins">5</span> min
+            <button class="num-btn" onclick="adjustTime('short',1)">+</button>
+          </span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">Long break</span>
+          <span class="settings-val">
+            <button class="num-btn" onclick="adjustTime('long',-5)">−</button>
+            <span id="longMins">15</span> min
+            <button class="num-btn" onclick="adjustTime('long',5)">+</button>
+          </span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">Sessions today</span>
+          <span class="settings-val" id="sessionCount" style="color:var(--sage-dark)">0 🌸</span>
+        </div>
+      </div>
+      <div class="timer-card">
+        <div class="section-title" style="font-size:16px;margin-bottom:10px">Today's Streak</div>
+        <div class="section-sub" style="margin-bottom:12px">Complete sessions to fill your streak</div>
+        <div class="streak-row" id="streakRow"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GARDEN -->
+<div id="panel-garden" class="panel">
+  <div style="max-width:900px;margin:0 auto">
+    <div class="garden-header">
+      <div>
+        <div class="section-title">My Flower Garden</div>
+        <div class="section-sub">Each flower represents a completed focus session</div>
+      </div>
+      <div class="garden-stats">
+        <div class="stat-pill">🌸 <strong id="gardenCount">0</strong> flowers</div>
+        <div class="stat-pill">⏱ <strong id="gardenHours">0h</strong> studied</div>
+        <div class="stat-pill">🗓 <strong id="gardenDays">0</strong> day streak</div>
+      </div>
+    </div>
+    <div class="garden-grid" id="gardenGrid"></div>
+  </div>
+</div>
+
+<!-- TODO -->
+<div id="panel-todo" class="panel">
+  <div class="todo-layout">
+    <div class="todo-header">
+      <div>
+        <div class="section-title">Tasks</div>
+        <div class="section-sub" id="todoMeta">0 pending · 0 done</div>
+      </div>
+    </div>
+    <div class="add-todo-form">
+      <input type="text" id="todoInput" placeholder="Add a new task..." onkeydown="if(event.key==='Enter')addTodo()"/>
+      <select class="priority-sel" id="todoPriority">
+        <option value="low">Low</option>
+        <option value="med" selected>Medium</option>
+        <option value="high">High</option>
+      </select>
+      <button class="add-btn" onclick="addTodo()">+ Add</button>
+    </div>
+    <div class="todo-filters">
+      <button class="filter-btn active" onclick="filterTodos('all',this)">All</button>
+      <button class="filter-btn" onclick="filterTodos('pending',this)">Pending</button>
+      <button class="filter-btn" onclick="filterTodos('done',this)">Done</button>
+      <button class="filter-btn" onclick="filterTodos('high',this)">High priority</button>
+    </div>
+    <div class="todo-list" id="todoList"></div>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div id="panel-calendar" class="panel">
+  <div class="cal-layout">
+    <div class="cal-card">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+        <div class="cal-month" id="calMonth">April 2026</div>
+        <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div>
+      <div class="cal-card" style="margin-bottom:16px">
+        <div class="event-date-title" id="selectedDateTitle">Select a date</div>
+        <div class="event-list" id="eventList"></div>
+        <div class="add-event-form" id="addEventForm" style="display:none">
+          <input type="text" id="eventTitle" placeholder="Event title..."/>
+          <input type="time" id="eventTime" value="09:00"/>
+          <div class="event-colors" style="padding:4px 0">
+            <span style="font-size:12px;color:var(--muted);margin-right:4px">Color:</span>
+            <button class="color-dot-btn selected" style="background:#f4a5b0" data-color="#f4a5b0" onclick="selectColor(this)"></button>
+            <button class="color-dot-btn" style="background:#7a9e7e" data-color="#7a9e7e" onclick="selectColor(this)"></button>
+            <button class="color-dot-btn" style="background:#b3cde8" data-color="#b3cde8" onclick="selectColor(this)"></button>
+            <button class="color-dot-btn" style="background:#f9c8a6" data-color="#f9c8a6" onclick="selectColor(this)"></button>
+            <button class="color-dot-btn" style="background:#d4b8e0" data-color="#d4b8e0" onclick="selectColor(this)"></button>
+          </div>
+          <button class="add-btn" onclick="addEvent()">Save Event</button>
+        </div>
+        <button class="add-btn" id="newEventBtn" onclick="toggleEventForm()" style="width:100%;margin-top:8px;background:var(--warm);color:var(--sage-dark);border:1px solid #ddd">+ New Event</button>
+      </div>
+      <div class="cal-card">
+        <div class="section-title" style="font-size:15px;margin-bottom:12px">Upcoming</div>
+        <div id="upcomingList" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ---- STATE ----
+let timerInterval=null, timerRunning=false;
+let focusMins=25, shortMins=5, longMins=15;
+let currentMode='focus';
+let timeLeft=focusMins*60;
+let totalTime=focusMins*60;
+let sessions=0;
+let flowers=JSON.parse(localStorage.getItem('bloom_flowers')||'[]');
+let todos=JSON.parse(localStorage.getItem('bloom_todos')||'[]');
+let events=JSON.parse(localStorage.getItem('bloom_events')||'{}');
+let calYear=2026, calMonth=3;
+let selectedDate=null;
+let selectedColor='#f4a5b0';
+let todoFilter='all';
+let flowerProgress=0;
+
+// ---- LOGO MENU LOGIC ----
+function toggleMenu(event) {
+  event.stopPropagation(); 
+  const menu = document.getElementById('logoMenu');
+  menu.classList.toggle('show');
+}
+
+// Close the menu if user clicks anywhere else
+window.addEventListener('click', function(event) {
+  const menu = document.getElementById('logoMenu');
+  const logo = document.getElementById('logoBtn');
+  
+  // If the menu is open and the click wasn't on the menu or the logo
+  if (menu.classList.contains('show') && !menu.contains(event.target) && event.target !== logo) {
+    menu.classList.remove('show');
+  }
+});
+
+// Helper to make sure menu closes when you switch tabs
+function switchTab(tabId, event) {
+  // Close menu
+  document.getElementById('logoMenu').classList.remove('show');
+  
+  // Existing tab logic
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tabId).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ---- FLOWERS ----
+const flowerTypes=[
+  {petals:5,pColor:'#f4a5b0',cColor:'#f9e4a6'},
+  {petals:6,pColor:'#d4b8e0',cColor:'#f9e4a6'},
+  {petals:8,pColor:'#f9c8a6',cColor:'#fff'},
+  {petals:5,pColor:'#b3cde8',cColor:'#f9e4a6'},
+  {petals:7,pColor:'#a8d8b0',cColor:'#f9e4a6'},
+  {petals:4,pColor:'#f4a5b0',cColor:'#d4b8e0'},
+];
+function drawFlower(svgEl,progress,type,size=1,cx=60,cy=140){
+  const t=flowerTypes[type%flowerTypes.length];
+  const stemH=Math.min(100,progress*100)*size;
+  const leafOpacity=progress>0.3?1:0;
+  const petalScale=Math.max(0,(progress-0.5)*2);
+  let html='';
+  if(stemH>0){
+    const sy=cy, sx=cx;
+    html+=`<line x1="${sx}" y1="${sy}" x2="${sx}" y2="${sy-stemH}" stroke="#7a9e7e" stroke-width="${2.5*size}" stroke-linecap="round"/>`;
+    if(leafOpacity>0&&stemH>30){
+      const lx=sx,ly=sy-stemH*0.5;
+      html+=`<path d="M${lx},${ly} Q${lx+14*size},${ly-8*size} ${lx+8*size},${ly-18*size} Q${lx+2*size},${ly-8*size} ${lx},${ly}" fill="#7a9e7e" opacity="${leafOpacity}"/>`;
+      html+=`<path d="M${lx},${ly} Q${lx-14*size},${ly-8*size} ${lx-8*size},${ly-18*size} Q${lx-2*size},${ly-8*size} ${lx},${ly}" fill="#a8d8b0" opacity="${leafOpacity}"/>`;
+    }
+  }
+  if(petalScale>0){
+    const py=cy-stemH;
+    const pr=18*size*petalScale;
+    for(let i=0;i<t.petals;i++){
+      const angle=(i/t.petals)*Math.PI*2-Math.PI/2;
+      const px2=cx+Math.cos(angle)*pr;
+      const py2=py+Math.sin(angle)*pr;
+      html+=`<ellipse cx="${px2}" cy="${py2}" rx="${9*size*petalScale}" ry="${5*size*petalScale}" fill="${t.pColor}" transform="rotate(${angle*180/Math.PI+90},${px2},${py2})" opacity="${petalScale}"/>`;
+    }
+    html+=`<circle cx="${cx}" cy="${py}" r="${7*size*petalScale}" fill="${t.cColor}" opacity="${petalScale}"/>`;
+  }
+  svgEl.innerHTML=html;
+}
+
+function drawGrowingFlower(){
+  const svg=document.getElementById('flowerSvg');
+  drawFlower(svg,flowerProgress,sessions%flowerTypes.length,1,60,155);
+}
+
+// ---- TIMER ----
+function pad(n){return String(n).padStart(2,'0')}
+function updateDisplay(){
+  const m=Math.floor(timeLeft/60),s=timeLeft%60;
+  document.getElementById('timerDisplay').textContent=`${pad(m)}:${pad(s)}`;
+  const pct=1-(timeLeft/totalTime);
+  const circ=565;
+  const offset=circ-(pct*circ);
+  document.getElementById('timerCircle').style.strokeDashoffset=offset;
+  const hue=currentMode==='focus'?'#7a9e7e':(currentMode==='short'?'#b3cde8':'#d4b8e0');
+  document.getElementById('timerCircle').style.stroke=hue;
+  flowerProgress=currentMode==='focus'?pct:flowerProgress;
+  drawGrowingFlower();
+}
+function toggleTimer(){
+  if(timerRunning){
+    clearInterval(timerInterval);
+    timerRunning=false;
+    document.getElementById('startBtn').textContent='▶';
+  }else{
+    timerRunning=true;
+    document.getElementById('startBtn').textContent='⏸';
+    timerInterval=setInterval(()=>{
+      timeLeft--;
+      if(timeLeft<=0){completeSession();return;}
+      updateDisplay();
+    },1000);
+  }
+}
+function completeSession(){
+  clearInterval(timerInterval);
+  timerRunning=false;
+  document.getElementById('startBtn').textContent='▶';
+  if(currentMode==='focus'){
+    sessions++;
+    flowerProgress=1;
+    drawGrowingFlower();
+    const fl={type:(sessions-1)%flowerTypes.length,date:new Date().toISOString(),label:`Session ${sessions}`};
+    flowers.push(fl);
+    localStorage.setItem('bloom_flowers',JSON.stringify(flowers));
+    updateSessionCount();
+    renderGarden();
+    showToast('🌸 Session complete! A flower bloomed in your garden!');
+  }
+  setTimeout(()=>{
+    flowerProgress=0;
+    setMode(currentMode==='focus'?'short':'focus',null,true);
+  },1200);
+}
+function resetTimer(){
+  clearInterval(timerInterval);
+  timerRunning=false;
+  document.getElementById('startBtn').textContent='▶';
+  const modeMap={focus:focusMins,short:shortMins,long:longMins};
+  totalTime=modeMap[currentMode]*60;
+  timeLeft=totalTime;
+  if(currentMode==='focus')flowerProgress=0;
+  updateDisplay();
+}
+function skipSession(){completeSession()}
+function setMode(mode,btn,auto=false){
+  currentMode=mode;
+  if(!auto){
+    document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+    if(btn)btn.classList.add('active');
+  }
+  clearInterval(timerInterval);
+  timerRunning=false;
+  document.getElementById('startBtn').textContent='▶';
+  const modeMap={focus:focusMins,short:shortMins,long:longMins};
+  totalTime=modeMap[mode]*60;
+  timeLeft=totalTime;
+  const labels={focus:'FOCUS TIME',short:'SHORT BREAK',long:'LONG BREAK'};
+  document.getElementById('timerLabel').textContent=labels[mode];
+  flowerProgress=0;
+  updateDisplay();
+}
+function adjustTime(type,delta){
+  if(type==='focus'){focusMins=Math.max(5,Math.min(90,focusMins+delta));document.getElementById('focusMins').textContent=focusMins;}
+  if(type==='short'){shortMins=Math.max(1,Math.min(30,shortMins+delta));document.getElementById('shortMins').textContent=shortMins;}
+  if(type==='long'){longMins=Math.max(5,Math.min(60,longMins+delta));document.getElementById('longMins').textContent=longMins;}
+  if(currentMode===type)resetTimer();
+}
+function updateSessionCount(){
+  document.getElementById('sessionCount').textContent=`${sessions} 🌸`;
+  const row=document.getElementById('streakRow');
+  const target=8;
+  row.innerHTML='';
+  for(let i=0;i<target;i++){
+    const d=document.createElement('div');
+    d.className='streak-dot'+(i<sessions?' done':'');
+    d.textContent=i<sessions?'✓':'';
+    row.appendChild(d);
+  }
+}
+
+// ---- GARDEN ----
+function renderGarden(){
+  const grid=document.getElementById('gardenGrid');
+  grid.innerHTML='';
+  const slots=Math.max(flowers.length+4,12);
+  document.getElementById('gardenCount').textContent=flowers.length;
+  const hrs=Math.round(flowers.length*focusMins/60*10)/10;
+  document.getElementById('gardenHours').textContent=hrs+'h';
+  document.getElementById('gardenDays').textContent=Math.ceil(flowers.length/4)||0;
+  for(let i=0;i<slots;i++){
+    const plot=document.createElement('div');
+    plot.className='plot';
+    if(i<flowers.length){
+      const f=flowers[i];
+      const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('width','60');svg.setAttribute('height','70');svg.setAttribute('viewBox','0 0 60 70');
+      plot.appendChild(svg);
+      const d=new Date(f.date);
+      const label=document.createElement('div');
+      label.className='plot-label';
+      label.textContent=`${d.getMonth()+1}/${d.getDate()}`;
+      plot.appendChild(label);
+      grid.appendChild(plot);
+      drawFlower(svg,1,f.type,0.55,30,68);
+    }else{
+      const empty=document.createElement('div');
+      empty.className='empty-plot';
+      empty.textContent=i===flowers.length?'🌱':'';
+      plot.appendChild(empty);
+      grid.appendChild(plot);
+    }
+  }
+}
+
+// ---- TODOS ----
+function saveTodos(){localStorage.setItem('bloom_todos',JSON.stringify(todos))}
+function priorityTag(p){
+  const map={high:['#fce4e4','#c5785f','High'],med:['#fef3e2','#b8860b','Med'],low:['#eaf3de','#4a6e4e','Low']};
+  const [bg,col,label]=map[p]||map.med;
+  return `<span class="todo-tag" style="background:${bg};color:${col}">${label}</span>`;
+}
+function renderTodos(){
+  const list=document.getElementById('todoList');
+  const pending=todos.filter(t=>!t.done).length;
+  const done=todos.filter(t=>t.done).length;
+  document.getElementById('todoMeta').textContent=`${pending} pending · ${done} done`;
+  let filtered=todos;
+  if(todoFilter==='pending')filtered=todos.filter(t=>!t.done);
+  if(todoFilter==='done')filtered=todos.filter(t=>t.done);
+  if(todoFilter==='high')filtered=todos.filter(t=>t.priority==='high');
+  list.innerHTML='';
+  if(filtered.length===0){
+    list.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted);font-size:14px">Nothing here yet 🌸</div>';
+    return;
+  }
+  filtered.forEach((t,i)=>{
+    const idx=todos.indexOf(t);
+    const el=document.createElement('div');
+    el.className='todo-item'+(t.done?' done':'');
+    el.innerHTML=`
+      <div class="todo-check ${t.done?'checked':''}" onclick="toggleTodo(${idx})">
+        ${t.done?'✓':''}
+      </div>
+      <span class="todo-text ${t.done?'done':''}">${t.text}</span>
+      ${priorityTag(t.priority)}
+      <button class="todo-del" onclick="deleteTodo(${idx})">×</button>`;
+    list.appendChild(el);
+  });
+}
+function addTodo(){
+  const input=document.getElementById('todoInput');
+  const text=input.value.trim();
+  if(!text)return;
+  const priority=document.getElementById('todoPriority').value;
+  todos.unshift({text,priority,done:false,created:Date.now()});
+  input.value='';
+  saveTodos();renderTodos();
+}
+function toggleTodo(i){todos[i].done=!todos[i].done;saveTodos();renderTodos()}
+function deleteTodo(i){todos.splice(i,1);saveTodos();renderTodos()}
+function filterTodos(f,btn){
+  todoFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderTodos();
+}
+
+// ---- CALENDAR ----
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function dateKey(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`}
+function saveEvents(){localStorage.setItem('bloom_events',JSON.stringify(events))}
+function renderCalendar(){
+  document.getElementById('calMonth').textContent=`${MONTHS[calMonth]} ${calYear}`;
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  DAYS.forEach(d=>{const el=document.createElement('div');el.className='cal-day-name';el.textContent=d;grid.appendChild(el);});
+  const first=new Date(calYear,calMonth,1).getDay();
+  const total=new Date(calYear,calMonth+1,0).getDate();
+  const today=new Date();
+  for(let i=0;i<first;i++){
+    const prevTotal=new Date(calYear,calMonth,0).getDate();
+    const day=prevTotal-first+i+1;
+    const el=document.createElement('div');
+    el.className='cal-day other-month';
+    el.innerHTML=`<span class="day-num">${day}</span>`;
+    grid.appendChild(el);
+  }
+  for(let d=1;d<=total;d++){
+    const key=dateKey(calYear,calMonth,d);
+    const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d;
+    const isSel=selectedDate===key;
+    const hasEvents=events[key]&&events[key].length>0;
+    const el=document.createElement('div');
+    el.className='cal-day'+(isToday?' today':'')+(isSel?' selected':'');
+    el.innerHTML=`<span class="day-num">${d}</span>${hasEvents?'<div class="day-dot"></div>':''}`;
+    el.onclick=()=>selectDate(calYear,calMonth,d);
+    grid.appendChild(el);
+  }
+  const remaining=(7-(first+total)%7)%7;
+  for(let d=1;d<=remaining;d++){
+    const el=document.createElement('div');
+    el.className='cal-day other-month';
+    el.innerHTML=`<span class="day-num">${d}</span>`;
+    grid.appendChild(el);
+  }
+  renderUpcoming();
+}
+function changeMonth(delta){
+  calMonth+=delta;
+  if(calMonth<0){calMonth=11;calYear--;}
+  if(calMonth>11){calMonth=0;calYear++;}
+  renderCalendar();
+}
+function selectDate(y,m,d){
+  selectedDate=dateKey(y,m,d);
+  renderCalendar();
+  const dt=new Date(y,m,d);
+  document.getElementById('selectedDateTitle').textContent=dt.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  renderEvents();
+  document.getElementById('addEventForm').style.display='none';
+  document.getElementById('newEventBtn').style.display='block';
+}
+function renderEvents(){
+  const list=document.getElementById('eventList');
+  list.innerHTML='';
+  if(!selectedDate)return;
+  const evs=(events[selectedDate]||[]).sort((a,b)=>a.time.localeCompare(b.time));
+  if(evs.length===0){list.innerHTML='<div style="font-size:13px;color:var(--muted);padding:8px 0">No events yet</div>';return;}
+  evs.forEach((ev,i)=>{
+    const el=document.createElement('div');
+    el.className='event-item';
+    el.innerHTML=`<div class="event-dot" style="background:${ev.color}"></div>
+      <div><div class="event-title">${ev.title}</div><div class="event-time">${ev.time}</div></div>
+      <button class="event-del" onclick="deleteEvent(${i})">×</button>`;
+    list.appendChild(el);
+  });
+}
+function deleteEvent(i){
+  events[selectedDate].splice(i,1);
+  saveEvents();renderEvents();renderCalendar();
+}
+function toggleEventForm(){
+  const form=document.getElementById('addEventForm');
+  const btn=document.getElementById('newEventBtn');
+  if(form.style.display==='none'){form.style.display='flex';btn.style.display='none';}
+  else{form.style.display='none';btn.style.display='block';}
+}
+function addEvent(){
+  if(!selectedDate)return;
+  const title=document.getElementById('eventTitle').value.trim();
+  const time=document.getElementById('eventTime').value;
+  if(!title)return;
+  if(!events[selectedDate])events[selectedDate]=[];
+  events[selectedDate].push({title,time,color:selectedColor});
+  document.getElementById('eventTitle').value='';
+  saveEvents();renderEvents();renderCalendar();
+  toggleEventForm();
+  showToast('📅 Event saved!');
+}
+function selectColor(btn){
+  document.querySelectorAll('.color-dot-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedColor=btn.dataset.color;
+}
+function renderUpcoming(){
+  const list=document.getElementById('upcomingList');
+  list.innerHTML='';
+  const today=new Date();
+  const upcoming=[];
+  Object.keys(events).forEach(key=>{
+    const d=new Date(key);
+    if(d>=today){
+      (events[key]||[]).forEach(ev=>{
+        upcoming.push({date:key,dateObj:d,...ev});
+      });
+    }
+  });
+  upcoming.sort((a,b)=>a.dateObj-b.dateObj);
+  upcoming.slice(0,5).forEach(ev=>{
+    const el=document.createElement('div');
+    el.className='event-item';
+    el.innerHTML=`<div class="event-dot" style="background:${ev.color}"></div>
+      <div><div class="event-title">${ev.title}</div><div class="event-time">${ev.date} · ${ev.time}</div></div>`;
+    list.appendChild(el);
+  });
+  if(upcoming.length===0)list.innerHTML='<div style="font-size:13px;color:var(--muted)">No upcoming events</div>';
+}
+
+// ---- TABS ----
+function switchTab(tab,e){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  e.currentTarget.classList.add('active');
+}
+
+// ---- TOAST ----
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ---- INIT ----
+updateDisplay();
+updateSessionCount();
+renderGarden();
+renderTodos();
+
+const now=new Date();
+calYear=now.getFullYear();calMonth=now.getMonth();
+renderCalendar();
+selectDate(calYear,calMonth,now.getDate());
+</script>
+</body>
+</html>
